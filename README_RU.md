@@ -36,6 +36,23 @@
 1. Установите `com.amizx2.ytvot_1.0.0_iphoneos-arm64.deb` через TrollStore, Sileo или Zebra.
 2. Перезапустите YouTube.
 
+### Вариант 3: Автоматическая сборка IPA на macOS (в 1 клик)
+Скрипт `build_macos.sh` автоматически распаковывает чистый YouTube IPA, внедряет `YTVOT.dylib`, прописывает команду загрузки в бинарник, подписывает ad-hoc сертификатом и упаковывает готовый к установке `YouTube_VOT.ipa`:
+
+```bash
+git clone https://github.com/Amizx2/YTVOT.git
+cd YTVOT
+
+# Поместите файл YouTube.ipa в папку с проектом
+chmod +x build_macos.sh
+./build_macos.sh YouTube.ipa
+```
+
+Если требуется также перекомпилировать `YTVOT.dylib` из исходников на Mac:
+```bash
+./build_macos.sh --compile YouTube.ipa
+```
+
 ---
 
 ## Сборка из исходников (Theos / Kali / Linux)

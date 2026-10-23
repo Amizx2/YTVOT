@@ -34,7 +34,21 @@ Ported and enhanced from [voice-over-translation](https://github.com/ilyhalight/
 1. Install `com.amizx2.ytvot_1.0.0_iphoneos-arm64.deb` using TrollStore, Sileo, or Zebra.
 2. Respring or restart YouTube.
 
-### Method 3: Azule CLI
+### Method 3: Automated IPA Build on macOS (Recommended)
+You can build a ready-to-install `YouTube_VOT.ipa` in one click on any Mac:
+```bash
+git clone https://github.com/Amizx2/YTVOT.git
+cd YTVOT
+# Place your YouTube.ipa in the folder
+chmod +x build_macos.sh
+./build_macos.sh YouTube.ipa
+```
+To recompile `YTVOT.dylib` from source on macOS:
+```bash
+./build_macos.sh --compile YouTube.ipa
+```
+
+### Method 4: Azule CLI
 ```bash
 azule -i YouTube.ipa -o YouTube_VOT.ipa -f YTVOT.dylib
 ```
