@@ -48,9 +48,23 @@
 - (UIViewController * _Nullable)topViewController {
     UIWindow *window = self.window;
     if (!window) {
-        for (UIWindow *w in UIApplication.sharedApplication.windows) {
-            if (w.isKeyWindow) { window = w; break; }
+        if (@available(iOS 13.0, *)) {
+            for (UIScene *s in UIApplication.sharedApplication.connectedScenes) {
+                if ([s isKindOfClass:[UIWindowScene class]] && s.activationState == UISceneActivationStateForegroundActive) {
+                    UIWindowScene *scene = (UIWindowScene *)s;
+                    for (UIWindow *w in scene.windows) {
+                        if (w.isKeyWindow) { window = w; break; }
+                    }
+                    if (window) break;
+                }
+            }
         }
+    }
+    if (!window) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        window = UIApplication.sharedApplication.keyWindow ?: UIApplication.sharedApplication.windows.firstObject;
+#pragma clang diagnostic pop
     }
     UIViewController *top = window.rootViewController;
     while (top.presentedViewController) {
@@ -77,12 +91,7 @@
                 img = [UIImage systemImageNamed:@"waveform" withConfiguration:config];
                 tint = [UIColor colorWithRed:1.0 green:0.8 blue:0.2 alpha:1.0]; // Yellow
 
-                UIActivityIndicatorView *spin;
-                if (@available(iOS 13.0, *)) {
-                    spin = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
-                } else {
-                    spin = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-                }
+                UIActivityIndicatorView *spin = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
                 spin.center = CGPointMake(self.bounds.size.width / 2.0, self.bounds.size.height / 2.0);
                 spin.color = tint;
                 [spin startAnimating];

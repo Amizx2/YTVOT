@@ -7,14 +7,22 @@ void YTVOTShowNotice(NSString *message) {
 
     dispatch_async(dispatch_get_main_queue(), ^{
         UIWindow *keyWindow = nil;
-        for (UIWindow *w in UIApplication.sharedApplication.windows) {
-            if (w.isKeyWindow) {
-                keyWindow = w;
-                break;
+        if (@available(iOS 13.0, *)) {
+            for (UIScene *s in UIApplication.sharedApplication.connectedScenes) {
+                if ([s isKindOfClass:[UIWindowScene class]] && s.activationState == UISceneActivationStateForegroundActive) {
+                    UIWindowScene *scene = (UIWindowScene *)s;
+                    for (UIWindow *w in scene.windows) {
+                        if (w.isKeyWindow) { keyWindow = w; break; }
+                    }
+                    if (keyWindow) break;
+                }
             }
         }
         if (!keyWindow) {
-            keyWindow = UIApplication.sharedApplication.windows.firstObject;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+            keyWindow = UIApplication.sharedApplication.keyWindow ?: UIApplication.sharedApplication.windows.firstObject;
+#pragma clang diagnostic pop
         }
         if (!keyWindow) return;
 
@@ -48,8 +56,8 @@ void YTVOTShowNotice(NSString *message) {
         [NSLayoutConstraint activateConstraints:@[
             [pill.centerXAnchor constraintEqualToAnchor:safe.centerXAnchor],
             [pill.bottomAnchor constraintEqualToAnchor:safe.bottomAnchor constant:-60.0],
-            [pill.widthAnchor greaterThanOrEqualToConstant:140.0],
-            [pill.widthAnchor lessThanOrEqualToAnchor:safe.widthAnchor constant:-40.0],
+            [pill.widthAnchor constraintGreaterThanOrEqualToConstant:140.0],
+            [pill.widthAnchor constraintLessThanOrEqualToAnchor:safe.widthAnchor constant:-40.0],
             [label.topAnchor constraintEqualToAnchor:pill.topAnchor constant:10.0],
             [label.bottomAnchor constraintEqualToAnchor:pill.bottomAnchor constant:-10.0],
             [label.leadingAnchor constraintEqualToAnchor:pill.leadingAnchor constant:16.0],
