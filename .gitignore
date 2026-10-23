@@ -1,0 +1,9 @@
+.theos/
+_theos/
+packages/
+*.deb
+*.dylib
+extracted_deb/
+.DS_Store
+*.ipa
+.vscode/

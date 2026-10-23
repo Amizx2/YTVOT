@@ -1,0 +1,9 @@
+Package: com.amizx2.ytvot
+Name: YTVOT
+Version: 1.0.0
+Architecture: iphoneos-arm64
+Description: Standalone Native Voice-Over Translation for YouTube iOS
+Maintainer: Amizx2
+Author: Amizx2
+Section: Tweaks
+Depends: mobilesubstrate
