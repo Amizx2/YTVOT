@@ -1,5 +1,7 @@
 # YTVOT — Standalone Voice-Over Translation for YouTube iOS
 
+[🇷🇺 **Читать на русском (README_RU.md)**](README_RU.md) | [📦 **Download Ready IPA (v1.0.0)**](https://github.com/Amizx2/YTVOT/releases/download/v1.0.0/YouTube_VOT_1.0.0.ipa) | [🧩 **Download YTVOT.dylib**](https://github.com/Amizx2/YTVOT/releases/download/v1.0.0/YTVOT.dylib)
+
 **YTVOT** is an independent, standalone iOS tweak that adds real-time AI Voice-Over Translation to the official YouTube app on iOS.
 
 Ported and enhanced from [voice-over-translation](https://github.com/ilyhalight/voice-over-translation) and [vot.js](https://github.com/FOSWLY/vot.js), **YTVOT** is completely decoupled from any other tweak. It compiles as a standalone `.dylib` and rootless `.deb`, allowing it to be injected into **any** YouTube IPA (stock YouTube, YTKACE, YTLite, uYouEnhanced, etc.).
@@ -9,7 +11,12 @@ Ported and enhanced from [voice-over-translation](https://github.com/ilyhalight/
 ## Features
 
 - **Universal Compatibility**: Works with stock YouTube and modded YouTube clients alike (YTKACE, YTLite, uYouEnhanced).
-- **Phase-Locked Loop (PLL) Audio Sync**: Eliminates audio drift. Micro-rate adjustments keep translated speech tightly locked to video playback.
+- **Phase-Locked Loop (PLL) Audio Sync**: Eliminates audio drift. Micro-rate adjustments keep translated speech tightly locked to video playback:
+
+$$
+\Delta t = t_{\text{video}} - t_{\text{audio}}, \quad \text{rate} = \text{rate}_{\text{video}} \times (1.0 + \text{clamp}(\Delta t \times 0.2, -0.12, +0.12))
+$$
+
 - **Smart Adaptive Ducking**: Uses offline audio speech scanning (`AVAssetReader`) to detect speech boundaries. The original video volume ducks **only** while translation is speaking, smoothly returning to normal during pauses.
 - **Voice Selection**: Choose between Automatic, Female, or Male voice.
 - **Multi-Language Support**: Translate videos into Russian (RU), English (EN), or Kazakh (KK).
@@ -22,53 +29,92 @@ Ported and enhanced from [voice-over-translation](https://github.com/ilyhalight/
 
 ---
 
-## Installation
+## 🛠️ Building & Packaging IPA on macOS
 
-### Method 1: Sideloading via Sideloadly or ESign (Non-Jailbroken)
-1. Download a YouTube `.ipa` file.
-2. In Sideloadly or ESign, choose **Inject Dylib** / **Add Framework**.
-3. Select `YTVOT.dylib`.
-4. Sign and install the IPA to your iPhone or iPad.
+The repository includes [`build_macos.sh`](build_macos.sh) — a complete, automated macOS script to build and inject YTVOT into any YouTube IPA in one click.
 
-### Method 2: Jailbroken / TrollStore (.deb)
-1. Install `com.amizx2.ytvot_1.0.0_iphoneos-arm64.deb` using TrollStore, Sileo, or Zebra.
-2. Respring or restart YouTube.
+### Requirements on Mac
+- macOS 12+ (Intel or Apple Silicon M1/M2/M3/M4)
+- Xcode Command Line Tools (`xcode-select --install`)
+- Python 3
 
-### Method 3: Automated IPA Build on macOS (Recommended)
-You can build a ready-to-install `YouTube_VOT.ipa` in one click on any Mac:
+### Step-by-Step Instructions
+
+1. **Clone the repository:**
 ```bash
 git clone https://github.com/Amizx2/YTVOT.git
 cd YTVOT
-# Place your YouTube.ipa in the folder
+```
+
+2. **Place a clean `YouTube.ipa`** into the project directory (or provide the full path as an argument).
+
+3. **Make the script executable and run:**
+```bash
 chmod +x build_macos.sh
 ./build_macos.sh YouTube.ipa
 ```
-To recompile `YTVOT.dylib` from source on macOS:
-```bash
-./build_macos.sh --compile YouTube.ipa
-```
 
-### Method 4: Azule CLI
-```bash
-azule -i YouTube.ipa -o YouTube_VOT.ipa -f YTVOT.dylib
-```
+The script will automatically:
+- Use pre-built `YTVOT.dylib` (or compile from source if missing).
+- Unpack `YouTube.ipa`.
+- Copy `YTVOT.dylib` into `Payload/YouTube.app/Frameworks/`.
+- Inject `@rpath/YTVOT.dylib` load command into the Mach-O binary using [`Tools/macho_inject.py`](Tools/macho_inject.py).
+- Sign with native macOS ad-hoc certificate (`codesign -f -s -`).
+- Pack everything into `YouTube_VOT.ipa`.
+
+### Script Options
+
+| Command | Description |
+| :--- | :--- |
+| `./build_macos.sh YouTube.ipa` | **Fast Repack**: Injects existing `YTVOT.dylib` into IPA (~3 seconds). |
+| `./build_macos.sh --compile YouTube.ipa` | **Full Build**: Recompiles `YTVOT.dylib` from source code via Theos, then builds `YouTube_VOT.ipa`. |
+| `./build_macos.sh --compile` | Compiles only `YTVOT.dylib` and Debian package without repacking an IPA. |
 
 ---
 
-## Building from Source
+## 💻 Building from Source
 
-### Requirements
-- RootHide Theos (or standard Theos with rootless support)
-- iOS 15.0+ SDK (e.g. `iPhoneOS16.5.sdk`)
-- Clang / Make / ldid
+### 1. On macOS (Theos)
+```bash
+# Set up Theos if not already installed
+export THEOS=~/theos
+[ -d "$THEOS" ] || git clone --recursive https://github.com/roothide/theos.git "$THEOS"
 
-### One-Click Build on Linux / Kali
+# Build package
+make clean
+make -j$(sysctl -n hw.ncpu) package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
+```
+The compiled library will be at `.theos/obj/YTVOT.dylib` and package at `packages/com.amizx2.ytvot_1.0.0_iphoneos-arm64.deb`.
+
+### 2. On Linux / Kali (1-Click)
 ```bash
 chmod +x build_kali.sh
 ./build_kali.sh
 ```
+The script installs system dependencies, configures RootHide Theos, downloads iOS SDK, compiles `.deb`, and extracts `YTVOT.dylib`.
 
-The script automatically sets up Theos, installs dependencies, compiles `packages/com.amizx2.ytvot_1.0.0_iphoneos-arm64.deb`, and extracts `YTVOT.dylib`.
+---
+
+## 📱 Installation Methods
+
+### Method 1: Prebuilt IPA (No Mac/PC required)
+Download the ready-to-use IPA directly from [Releases](https://github.com/Amizx2/YTVOT/releases/tag/v1.0.0):
+- **[YouTube_VOT_1.0.0.ipa](https://github.com/Amizx2/YTVOT/releases/download/v1.0.0/YouTube_VOT_1.0.0.ipa)**
+- Install via **TrollStore**, **Sideloadly**, **AltStore**, or **ESign**.
+
+### Method 2: Sideloadly / ESign (Dylib Injection)
+1. Download `YouTube.ipa` and [YTVOT.dylib](https://github.com/Amizx2/YTVOT/releases/download/v1.0.0/YTVOT.dylib).
+2. Open Sideloadly ➔ Advanced Options ➔ **Inject Dylibs/Frameworks** ➔ Add `YTVOT.dylib`.
+3. Sign and install to your device.
+
+### Method 3: Jailbroken / TrollStore (.deb)
+1. Download [com.amizx2.ytvot_1.0.0_iphoneos-arm64.deb](https://github.com/Amizx2/YTVOT/releases/download/v1.0.0/com.amizx2.ytvot_1.0.0_iphoneos-arm64.deb).
+2. Install via TrollStore, Sileo, or Zebra.
+
+### Method 4: Azule CLI (macOS / Linux)
+```bash
+azule -i YouTube.ipa -o YouTube_VOT.ipa -f YTVOT.dylib
+```
 
 ---
 
@@ -78,7 +124,7 @@ The script automatically sets up Theos, installs dependencies, compiles `package
 Source/
 ├── YTVOTDefines.h                 # Constants, enums, bundle IDs
 ├── YTVOTLog.h / .m                # Unified logging system
-├── YTVOTHooking.h / .m            # Silent runtime swizzling engine
+├── YTVOTHooking.h / .m            # Silent runtime swizzling engine (zero dependencies)
 ├── YTVOTPreferences.h / .m        # Persistent user settings
 ├── YTVOTLocalization.h / .m       # English / Russian localization
 ├── YTVOTNotice.h / .m             # Native floating HUD toast banners
