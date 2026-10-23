@@ -1,0 +1,87 @@
+name: Build YTVOT
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build YTVOT
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Dependencies
+        run: brew install ldid xz
+
+      - name: Setup Theos
+        run: git clone --recursive https://github.com/roothide/theos.git ${{ github.workspace }}/theos
+
+      - name: Setup iOS SDKs
+        run: |
+          rm -rf ${{ github.workspace }}/theos/sdks
+          git clone --depth=1 https://github.com/theos/sdks.git ${{ github.workspace }}/theos/sdks
+
+      - name: Build Package
+        run: |
+          make clean
+          make -j$(sysctl -n hw.ncpu) package \
+            FINALPACKAGE=1 \
+            THEOS_PACKAGE_SCHEME=rootless \
+            DISABLE_ROOTLESS_COMPAT_WARNING=1
+        env:
+          THEOS: ${{ github.workspace }}/theos
+
+      - name: Prepare Artifacts
+        run: |
+          mkdir -p output
+          cp packages/*.deb output/ 2>/dev/null || true
+          cp YTVOT.plist output/ 2>/dev/null || true
+
+          # Extract dylib from deb or theos obj dir
+          if [ -f .theos/obj/YTVOT.dylib ]; then
+            cp .theos/obj/YTVOT.dylib output/
+          elif [ -f .theos/obj/debug/YTVOT.dylib ]; then
+            cp .theos/obj/debug/YTVOT.dylib output/
+          else
+            DEB_FILE=$(ls -t packages/*.deb | head -n1)
+            if [ -n "$DEB_FILE" ]; then
+              dpkg-deb -x "$DEB_FILE" temp_extract
+              find temp_extract -name "YTVOT.dylib" -exec cp {} output/ \;
+              rm -rf temp_extract
+            fi
+          fi
+          ls -la output/
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: YTVOT-build
+          path: output/*
+
+      - name: Generate Release Tag
+        id: tag
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          VERSION=$(grep '^Version:' control | awk '{print $2}')
+          echo "tag=v${VERSION}" >> $GITHUB_OUTPUT
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: YTVOT ${{ steps.tag.outputs.version }}
+          files: output/*
+          make_latest: true
+          fail_on_unmatched_files: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
