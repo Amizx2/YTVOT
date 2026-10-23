@@ -8,6 +8,18 @@ Ported and enhanced from [voice-over-translation](https://github.com/ilyhalight/
 
 ---
 
+## 📸 Screenshots
+
+<p align="center">
+  <img src="screenshots/player.png" width="31%" alt="Player Overlay Button" />
+  &nbsp;
+  <img src="screenshots/menu.png" width="31%" alt="Action Sheet Menu Item" />
+  &nbsp;
+  <img src="screenshots/settings.png" width="31%" alt="YTVOT Settings" />
+</p>
+
+---
+
 ## Features
 
 - **Universal Compatibility**: Works with stock YouTube and modded YouTube clients alike (YTKACE, YTLite, uYouEnhanced).
@@ -29,16 +41,11 @@ $$
 
 ---
 
-## 🛠️ Building & Packaging IPA on macOS
+## 🛠️ Building & Packaging IPA (macOS & Linux)
 
-The repository includes [`build_macos.sh`](build_macos.sh) — a complete, automated macOS script to build and inject YTVOT into any YouTube IPA in one click.
+Automated scripts are provided for both **macOS** and **Linux / Kali** to package a ready-to-install `YouTube_VOT.ipa` in one click.
 
-### Requirements on Mac
-- macOS 12+ (Intel or Apple Silicon M1/M2/M3/M4)
-- Xcode Command Line Tools (`xcode-select --install`)
-- Python 3
-
-### Step-by-Step Instructions
+### 🍎 Option A: On macOS (`build_macos.sh`)
 
 1. **Clone the repository:**
 ```bash
@@ -48,55 +55,61 @@ cd YTVOT
 
 2. **Place a clean `YouTube.ipa`** into the project directory (or provide the full path as an argument).
 
-3. **Make the script executable and run:**
+3. **Run the build script:**
 ```bash
 chmod +x build_macos.sh
 ./build_macos.sh YouTube.ipa
 ```
 
-The script will automatically:
-- Use pre-built `YTVOT.dylib` (or compile from source if missing).
-- Unpack `YouTube.ipa`.
-- Copy `YTVOT.dylib` into `Payload/YouTube.app/Frameworks/`.
-- Inject `@rpath/YTVOT.dylib` load command into the Mach-O binary using [`Tools/macho_inject.py`](Tools/macho_inject.py).
-- Sign with native macOS ad-hoc certificate (`codesign -f -s -`).
-- Pack everything into `YouTube_VOT.ipa`.
-
-### Script Options
-
-| Command | Description |
-| :--- | :--- |
-| `./build_macos.sh YouTube.ipa` | **Fast Repack**: Injects existing `YTVOT.dylib` into IPA (~3 seconds). |
-| `./build_macos.sh --compile YouTube.ipa` | **Full Build**: Recompiles `YTVOT.dylib` from source code via Theos, then builds `YouTube_VOT.ipa`. |
-| `./build_macos.sh --compile` | Compiles only `YTVOT.dylib` and Debian package without repacking an IPA. |
+- **Fast Repack (default)**: Injects prebuilt `YTVOT.dylib` into IPA in ~3 seconds.
+- **Full Recompile + Repack**: `./build_macos.sh --compile YouTube.ipa` (recompiles `YTVOT.dylib` from source code via Theos before packaging).
 
 ---
 
-## 💻 Building from Source
+### 🐧 Option B: On Linux / Kali / Ubuntu (`build_kali.sh`)
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/Amizx2/YTVOT.git
+cd YTVOT
+```
+
+2. **Place a clean `YouTube.ipa`** into the project directory (or provide the full path as an argument).
+
+3. **Run the build script:**
+```bash
+chmod +x build_kali.sh
+./build_kali.sh YouTube.ipa
+```
+
+The script automatically sets up dependencies, compiles the tweak via Theos, unpacks `YouTube.ipa`, injects `YTVOT.dylib` via [`Tools/macho_inject.py`](Tools/macho_inject.py), signs with `ldid`, and outputs `YouTube_VOT.ipa`.
+
+---
+
+## 💻 Building from Source (Compiling Tweak Only)
+
+If you only want to compile the `.dylib` and `.deb` packages without packaging an IPA:
 
 ### 1. On macOS (Theos)
 ```bash
-# Set up Theos if not already installed
 export THEOS=~/theos
 [ -d "$THEOS" ] || git clone --recursive https://github.com/roothide/theos.git "$THEOS"
 
-# Build package
 make clean
 make -j$(sysctl -n hw.ncpu) package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
 ```
-The compiled library will be at `.theos/obj/YTVOT.dylib` and package at `packages/com.amizx2.ytvot_1.0.0_iphoneos-arm64.deb`.
+Artifacts: `.theos/obj/YTVOT.dylib` and `packages/com.amizx2.ytvot_1.0.0_iphoneos-arm64.deb`.
 
-### 2. On Linux / Kali (1-Click)
+### 2. On Linux / Kali / Ubuntu
 ```bash
 chmod +x build_kali.sh
 ./build_kali.sh
 ```
-The script installs system dependencies, configures RootHide Theos, downloads iOS SDK, compiles `.deb`, and extracts `YTVOT.dylib`.
+*(Running without specifying an IPA compiles the `.deb` package and extracts `YTVOT.dylib` to the current folder).*
 
 ---
 
 ## 📱 Installation Methods
-
 
 ### Method 1: Sideloadly / ESign (Dylib Injection)
 1. Download `YouTube.ipa` and [YTVOT.dylib](https://github.com/Amizx2/YTVOT/releases/download/v1.0.0/YTVOT.dylib).
