@@ -13,11 +13,13 @@
 ## 📸 Скриншоты работы твика
 
 <p align="center">
-  <img src="screenshots/player.png" width="31%" alt="Кнопка на плеере YouTube" />
+  <img src="screenshots/player.png" width="23%" alt="Кнопка на плеере YouTube" />
   &nbsp;
-  <img src="screenshots/menu.png" width="31%" alt="Пункт в меню действий видео" />
+  <img src="screenshots/menu.png" width="23%" alt="Пункт в меню действий видео" />
   &nbsp;
-  <img src="screenshots/settings.png" width="31%" alt="Настройки YTVOT" />
+  <img src="screenshots/settings_account.png" width="23%" alt="Аккаунт и язык перевода" />
+  &nbsp;
+  <img src="screenshots/settings.png" width="23%" alt="Настройки адаптивной громкости" />
 </p>
 
 ---

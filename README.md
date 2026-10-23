@@ -11,11 +11,13 @@ Ported and enhanced from [voice-over-translation](https://github.com/ilyhalight/
 ## 📸 Screenshots
 
 <p align="center">
-  <img src="screenshots/player.png" width="31%" alt="Player Overlay Button" />
+  <img src="screenshots/player.png" width="23%" alt="Player Overlay Button" />
   &nbsp;
-  <img src="screenshots/menu.png" width="31%" alt="Action Sheet Menu Item" />
+  <img src="screenshots/menu.png" width="23%" alt="Action Sheet Menu Item" />
   &nbsp;
-  <img src="screenshots/settings.png" width="31%" alt="YTVOT Settings" />
+  <img src="screenshots/settings_account.png" width="23%" alt="YTVOT Account & Language" />
+  &nbsp;
+  <img src="screenshots/settings.png" width="23%" alt="YTVOT Adaptive Audio Settings" />
 </p>
 
 ---
