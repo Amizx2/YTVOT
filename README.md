@@ -97,21 +97,17 @@ The script installs system dependencies, configures RootHide Theos, downloads iO
 
 ## 📱 Installation Methods
 
-### Method 1: Prebuilt IPA (No Mac/PC required)
-Download the ready-to-use IPA directly from [Releases](https://github.com/Amizx2/YTVOT/releases/tag/v1.0.0):
-- **[YouTube_VOT_1.0.0.ipa](https://github.com/Amizx2/YTVOT/releases/download/v1.0.0/YouTube_VOT_1.0.0.ipa)**
-- Install via **TrollStore**, **Sideloadly**, **AltStore**, or **ESign**.
 
-### Method 2: Sideloadly / ESign (Dylib Injection)
+### Method 1: Sideloadly / ESign (Dylib Injection)
 1. Download `YouTube.ipa` and [YTVOT.dylib](https://github.com/Amizx2/YTVOT/releases/download/v1.0.0/YTVOT.dylib).
 2. Open Sideloadly ➔ Advanced Options ➔ **Inject Dylibs/Frameworks** ➔ Add `YTVOT.dylib`.
 3. Sign and install to your device.
 
-### Method 3: Jailbroken / TrollStore (.deb)
+### Method 2: Jailbroken / TrollStore (.deb)
 1. Download [com.amizx2.ytvot_1.0.0_iphoneos-arm64.deb](https://github.com/Amizx2/YTVOT/releases/download/v1.0.0/com.amizx2.ytvot_1.0.0_iphoneos-arm64.deb).
 2. Install via TrollStore, Sileo, or Zebra.
 
-### Method 4: Azule CLI (macOS / Linux)
+### Method 3: Azule CLI (macOS / Linux)
 ```bash
 azule -i YouTube.ipa -o YouTube_VOT.ipa -f YTVOT.dylib
 ```
