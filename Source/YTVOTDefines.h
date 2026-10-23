@@ -9,12 +9,12 @@ NS_ASSUME_NONNULL_BEGIN
 #define YTVOT_VERSION @"1.0.0"
 
 typedef NS_ENUM(NSInteger, YTVOTState) {
-    YTVOTStateIdle = 0,
-    YTVOTStateRequesting,
-    YTVOTStateWaiting,
-    YTVOTStatePlaying,
-    YTVOTStatePaused,
-    YTVOTStateError
+    YTVOTStateDisabled = 0,
+    YTVOTStateIdle = 1,
+    YTVOTStateLoading = 2,
+    YTVOTStatePlaying = 3,
+    YTVOTStatePaused = 4,
+    YTVOTStateError = 5
 };
 
 typedef NS_ENUM(NSInteger, YTVOTButtonPlacement) {

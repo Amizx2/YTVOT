@@ -334,10 +334,7 @@ NSString * const YTVOTStateDidChangeNotification = @"YTVOTStateDidChangeNotifica
     if (btn == nil) return;
 
     YTVOTPreferences *prefs = [YTVOTPreferences sharedPreferences];
-    BOOL enabled = prefs.enabled;
-    NSInteger placement = [defaults integerForKey:@"YTVOT.Preference.VOT.Placement"]; // 0=overlay, 1=menu, 2=both
-
-    if (!enabled || placement == YTVOTButtonPlacementMenu) {
+    if (!prefs.enabled || prefs.buttonPlacement == YTVOTButtonPlacementMenu) {
         btn.hidden = YES;
         return;
     }

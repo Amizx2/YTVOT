@@ -23,7 +23,8 @@ typedef NS_ENUM(NSInteger, YTVOTStatus) {
 @property (nonatomic, copy, nullable) NSString *message;
 @end
 
-typedef void (^YTVOTClientCompletion)(YTVOTResponse * _Nullable response, NSError * _Nullable error);
+typedef void (^YTVOTCompletion)(YTVOTResponse * _Nullable response, NSError * _Nullable error);
+typedef YTVOTCompletion YTVOTClientCompletion;
 
 @interface YTVOTClient : NSObject
 

@@ -86,8 +86,7 @@
         UIColor *tint = UIColor.whiteColor;
 
         switch (state) {
-            case YTVOTStateRequesting:
-            case YTVOTStateWaiting: {
+            case YTVOTStateLoading: {
                 img = [UIImage systemImageNamed:@"waveform" withConfiguration:config];
                 tint = [UIColor colorWithRed:1.0 green:0.8 blue:0.2 alpha:1.0]; // Yellow
 
